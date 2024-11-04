@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SlEqualizer } from 'react-icons/sl';
 import { useSearchParams } from 'react-router-dom';
 import Button from '../component/Button';
 import Filters from '../component/Filters';
@@ -10,7 +11,7 @@ function Home() {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
 
-    const [searchParams, setSearchParams] = useSearchParams({ q: '' });
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         const getProducts = async () => {
@@ -30,7 +31,7 @@ function Home() {
         setSearchParams(newParams);
     };
     //Filtering 
-    const isInStock = searchParams.get('status') === 'in stock';
+    const isInStock = searchParams.get('inStock') === 'true';
     const priceRange = searchParams.get('priceRange');
     const category = searchParams.get('category');
     const searchQuery = searchParams.get('q');
@@ -57,14 +58,20 @@ function Home() {
             <div className='flex'>
                 {/* Filters */}
                 <div className='w-1/5'>
-                    <h4 className='text-2xl font-semibold mb-5'>Filters</h4>
-                    <Filters products={products} />
+                    <div className='flex items-start justify-between mr-5'>
+                        <h4 className='text-2xl font-semibold mb-5 flex items-center gap-2'>Filters <SlEqualizer className='h-6 w-5' /></h4>
+                        <button
+                            onClick={() => setSearchParams('')}
+                            className='bg-blue-500 py-1 px-3 rounded-3xl'
+                        >Reset</button>
+                    </div>
+                    <Filters />
                 </div>
 
                 {/* Products */}
                 <div className='w-4/5'>
                     <div className='flex items-center justify-between'>
-                        <h3 className='text-xl font-semibold mb-5 border-l-4 border-blue-500 pl-2'>All Products</h3>
+                        <h3 className='text-xl font-semibold mb-5 border-l-4 border-blue-500 pl-2'>All Products <span className='text-base'>({filteredProducts && filteredProducts.length})</span></h3>
                         <input
                             type="text"
                             className='bg-gray-900 text-white focus:outline-none rounded-3xl py-2 px-4'

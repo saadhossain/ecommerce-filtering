@@ -4,7 +4,7 @@ import Checkbox from './Checkbox';
 import FilterTitle from './FilterTitle';
 import SmallSpinner from './SmallSpinner';
 
-const Filters = ({ products }) => {
+const Filters = () => {
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState([]);
 
@@ -59,17 +59,6 @@ const Filters = ({ products }) => {
                         checked={isInStock === 'true'}
                     />
                     <label for="inStock">In Stock</label>
-                </div>
-                <div className='flex items-center gap-2'>
-                    <input
-                        type="radio"
-                        id="outOfStock"
-                        name="availability"
-                        value="Out of Stock"
-                        onClick={() => handleSetStatus(false)}
-                        checked={isInStock === 'false'}
-                    />
-                    <label htmlFor="outOfStock">Out of Stock</label>
                 </div>
             </div>
             {/* Filter By Price Range */}
