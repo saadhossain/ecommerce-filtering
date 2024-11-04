@@ -10,7 +10,7 @@ function Home() {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
 
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams({ q: '' });
 
     useEffect(() => {
         const getProducts = async () => {
@@ -23,10 +23,17 @@ function Home() {
         getProducts();
     }, []);
 
+    //Handle Search
+    const handleSearch = (e) => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('q', e.target.value);
+        setSearchParams(newParams);
+    };
     //Filtering 
     const isInStock = searchParams.get('status') === 'in stock';
     const priceRange = searchParams.get('priceRange');
     const category = searchParams.get('category');
+    const searchQuery = searchParams.get('q');
 
     // Filter the products based on searchParams
     const filteredProducts = products.filter(product => {
@@ -36,7 +43,9 @@ function Home() {
             : true;
         const categoryFilter = category ? product.category === category : true;
 
-        return inStockFilter && priceFilter && categoryFilter;
+        const searchFilter = searchQuery ? product.title.toLowerCase().includes(searchQuery) : true;
+
+        return inStockFilter && priceFilter && categoryFilter && searchFilter;
     });
 
 
@@ -54,7 +63,15 @@ function Home() {
 
                 {/* Products */}
                 <div className='w-4/5'>
-                    <h3 className='text-xl font-semibold mb-5 border-l-4 border-blue-500 pl-2'>All Products</h3>
+                    <div className='flex items-center justify-between'>
+                        <h3 className='text-xl font-semibold mb-5 border-l-4 border-blue-500 pl-2'>All Products</h3>
+                        <input
+                            type="text"
+                            className='bg-gray-900 text-white focus:outline-none rounded-3xl py-2 px-4'
+                            placeholder='Search here...'
+                            onChange={handleSearch}
+                        />
+                    </div>
                     {
                         filteredProducts.length > 0 ? <div className='grid grid-cols-3 gap-5'>
                             {
