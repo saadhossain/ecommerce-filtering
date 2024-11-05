@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import Button from '../component/Button';
 import Filters from '../component/Filters';
 import Loading from '../component/Loading';
+import Pagination from '../component/Pagination';
 import ProductCard from '../component/ProductCard';
 import '../index.css';
 
@@ -16,7 +17,7 @@ function Home() {
     useEffect(() => {
         const getProducts = async () => {
             setLoading(true);
-            const res = await fetch('https://dummyjson.com/products?limit=90&skip=0');
+            const res = await fetch('https://dummyjson.com/products?limit=0&skip=0');
             const { products } = await res.json();
             setProducts(products);
             setLoading(false);
@@ -48,7 +49,16 @@ function Home() {
 
         return inStockFilter && priceFilter && categoryFilter && searchFilter;
     });
+    //Pagination Feature
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const itemsPerPage = 12;
 
+    // Calculate total pages
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+    // Get current page items
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentItems = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
     if (loading) {
         return <Loading />;
@@ -82,7 +92,7 @@ function Home() {
                     {
                         filteredProducts.length > 0 ? <div className='grid grid-cols-3 gap-5'>
                             {
-                                filteredProducts.map(product => <ProductCard
+                                currentItems.map(product => <ProductCard
                                     key={product.id}
                                     product={product}
                                 />)
@@ -94,6 +104,10 @@ function Home() {
                             </div>
                         </div>
                     }
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                    />
                 </div>
             </div>
         </div>
