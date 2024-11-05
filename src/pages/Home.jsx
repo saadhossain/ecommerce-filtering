@@ -10,20 +10,28 @@ import '../index.css';
 
 function Home() {
     const [loading, setLoading] = useState(false);
-    const [products, setProducts] = useState([]);
+    const [data, setData] = useState([]);
 
     const [searchParams, setSearchParams] = useSearchParams();
 
+    //Pagination Feature
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const itemsPerPage = 12;
+    const productToSkip = (currentPage - 1) * itemsPerPage;
+
     useEffect(() => {
-        const getProducts = async () => {
+        const getData = async () => {
             setLoading(true);
-            const res = await fetch('https://dummyjson.com/products?limit=0&skip=0');
-            const { products } = await res.json();
-            setProducts(products);
+            const res = await fetch(`https://dummyjson.com/products?limit=${itemsPerPage}&skip=${productToSkip}`);
+            const data = await res.json();
+            setData(data);
             setLoading(false);
         };
-        getProducts();
-    }, []);
+        getData();
+    }, [currentPage, productToSkip]);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(data.total / itemsPerPage);
 
     //Handle Search
     const handleSearch = (e) => {
@@ -37,6 +45,8 @@ function Home() {
     const category = searchParams.get('category');
     const searchQuery = searchParams.get('q');
 
+    //Products
+    const products = data.products || [];
     // Filter the products based on searchParams
     const filteredProducts = products.filter(product => {
         const inStockFilter = isInStock ? product.stock > 1 : true;
@@ -49,16 +59,6 @@ function Home() {
 
         return inStockFilter && priceFilter && categoryFilter && searchFilter;
     });
-    //Pagination Feature
-    const currentPage = parseInt(searchParams.get("page")) || 1;
-    const itemsPerPage = 12;
-
-    // Calculate total pages
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-    // Get current page items
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentItems = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
     if (loading) {
         return <Loading />;
@@ -92,7 +92,7 @@ function Home() {
                     {
                         filteredProducts.length > 0 ? <div className='grid grid-cols-3 gap-5'>
                             {
-                                currentItems.map(product => <ProductCard
+                                filteredProducts.map(product => <ProductCard
                                     key={product.id}
                                     product={product}
                                 />)
